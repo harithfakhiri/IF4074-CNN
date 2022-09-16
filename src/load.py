@@ -8,7 +8,8 @@ import os
 from numpy import asarray
 from PIL import Image
 
-root = 'C:/Users/Lenovo/Documents/semester 7/advanced ml/milestone a/IF4074-CNN/dataset'
+root = os.path.dirname(os.path.abspath(__file__)) +'\..\dataset'
+print(root)
 
 # change the working directory to the path where the images are located
 def createPath(root, animal):
@@ -50,7 +51,53 @@ def createMatrix(path,animal_arr,idx):
     print(data)
     print(len(data))
     print(len(data[0]))
-    print(len(data[0][0]))
+    print("red only")
+    red = createOneColor(data, 0)
+    blue = createOneColor(data, 1)
+    green = createOneColor(data, 2)
+    # print(createRedOnly(data))
+    print("red")
+    print(red[0][0])
+    print(red[0][1])
+    print(red[0][2])
+    print(red[1][0])
+    print(red[1][1])
+    print(red[1][2])
+    print("blue")
+    print(blue[0][0])
+    print(blue[0][1])
+    print(blue[0][2])
+    print(blue[1][0])
+    print(blue[1][1])
+    print(blue[1][2])
+    print("green")
+    print(green[0][0])
+    print(green[0][1])
+    print(green[0][2])
+    print(green[1][0])
+    print(green[1][1])
+    print(green[1][2])
+
+def createRedOnly(animal_arr):
+    for i in range(len(animal_arr)):
+        for j in range(len(animal_arr[0])):
+            for k in range(len(animal_arr[0][0])):
+                if(k!=0):
+                    animal_arr[i][j][k] = 0
+    # print(animal_arr)
+    return animal_arr
+
+def createOneColor(color_one,idx):
+    height_px = len(color_one)
+    width_px = len(color_one[0])
+    red = [[0 for c in range(width_px)] for r in range(height_px)]
+    for i in range(height_px):
+        for j in range(width_px):
+            red[i][j] = color_one[i][j][idx]
+    return red
+    
+
+    
 
 dogs = loadDataSet(root, 'dogs')
 cats = loadDataSet(root, 'cats')

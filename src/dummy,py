@@ -1,0 +1,9 @@
+table = [[0 for c in range(3)] for r in range(4)]
+copied = [[0 for c in range(len(table[0]))] for r in range(len(table))]
+print(table)
+print(copied)
+for i in range(len(copied)):
+    for j in range(len(copied[0])):
+        print(copied[i][j], end="")
+    print()
+    
