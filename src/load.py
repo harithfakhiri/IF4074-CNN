@@ -32,20 +32,20 @@ def loadDataSet(root, animal):
     return animal
 
 def createMatrix(path,animal_arr,idx):
-    # print(animal_arr)
+    print(animal_arr[idx])
     image = Image.open(path+'/'+animal_arr[idx])
-    # print(animal_arr[idx])
     # convert image to numpy array
     # print(image)
     data = asarray(image)
-    # print(type(data))
-    # summarize shape
-    print(data.shape)
 
     squared = squaredPadding(data)
     red = createOneColor(squared, 0)
     green = createOneColor(squared, 1)
     blue = createOneColor(squared, 2)
+    split_matrix = np.array([red,green,blue])
+    print(split_matrix)
+    print(split_matrix.shape)
+    return split_matrix
 
 def createRedOnly(animal_arr):
     for i in range(len(animal_arr)):
@@ -85,5 +85,6 @@ def squaredPadding(RGB_Matrix):
     
 
 dogs = loadDataSet(root, 'dogs')
+print(dogs)
 cats = loadDataSet(root, 'cats')
-createMatrix(createPath(root,'dogs'), dogs, 0)
+createMatrix(createPath(root,'dogs'), dogs, 9)
