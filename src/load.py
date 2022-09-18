@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 
 #others
 import os
+import numpy as np
 from numpy import asarray
 from PIL import Image
 
-root = os.path.dirname(os.path.abspath(__file__)) +'\..\dataset'
+root = os.path.dirname(os.path.abspath(__file__)) +'/../dataset'
 print(root)
 
 # change the working directory to the path where the images are located
@@ -32,8 +33,9 @@ def loadDataSet(root, animal):
     return animal
 
 def createMatrix(path,animal_arr,idx):
-    print(animal_arr)
+    # print(animal_arr)
     image = Image.open(path+'/'+animal_arr[idx])
+    print(animal_arr[idx])
     # convert image to numpy array
     print(image)
     data = asarray(image)
@@ -49,34 +51,11 @@ def createMatrix(path,animal_arr,idx):
     print(image2.mode)
     print(image2.size)
     print(data)
-    print(len(data))
-    print(len(data[0]))
+    print('====')
     print("red only")
     red = createOneColor(data, 0)
-    blue = createOneColor(data, 1)
-    green = createOneColor(data, 2)
-    # print(createRedOnly(data))
-    print("red")
-    print(red[0][0])
-    print(red[0][1])
-    print(red[0][2])
-    print(red[1][0])
-    print(red[1][1])
-    print(red[1][2])
-    print("blue")
-    print(blue[0][0])
-    print(blue[0][1])
-    print(blue[0][2])
-    print(blue[1][0])
-    print(blue[1][1])
-    print(blue[1][2])
-    print("green")
-    print(green[0][0])
-    print(green[0][1])
-    print(green[0][2])
-    print(green[1][0])
-    print(green[1][1])
-    print(green[1][2])
+    green = createOneColor(data, 1)
+    blue = createOneColor(data, 2)
 
 def createRedOnly(animal_arr):
     for i in range(len(animal_arr)):
@@ -90,15 +69,20 @@ def createRedOnly(animal_arr):
 def createOneColor(color_one,idx):
     height_px = len(color_one)
     width_px = len(color_one[0])
-    red = [[0 for c in range(width_px)] for r in range(height_px)]
+    # red = [[0 for c in range(width_px)] for r in range(height_px)]
+    red = np.zeros((height_px, width_px), dtype=int)
     for i in range(height_px):
         for j in range(width_px):
             red[i][j] = color_one[i][j][idx]
     return red
     
-
+def squaredPadding(color_one):
+    width, height = color_one.size[0], color_one.size[1]
+    matrix = np.zeros((height,width,3),dtype=int)
+    return matrix
     
 
 dogs = loadDataSet(root, 'dogs')
 cats = loadDataSet(root, 'cats')
 createMatrix(createPath(root,'dogs'), dogs, 0)
+print(squaredPadding(dogs))
