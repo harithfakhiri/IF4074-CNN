@@ -83,12 +83,11 @@ class Utils():
         for i in range(len(animal_arr[1])):
             total_matrix.append(self.createMatrix(animal_arr, i, "cats"))
         #labeling array
-        
+
         # 0 == dogs
         # 1 == cats
         label_array = np.zeros(len(total_matrix))
         for i in range(len(label_array)):
-            print(i)
             if (i < len(animal_arr[0])):
                 label_array[i] = 0
             else:

@@ -8,15 +8,13 @@ class ConvolutionalStage():
         self.num_filter = num_filter
         self.stride = stride
         self.bias = np.zeros((num_filter))
-        self.kernel = np.random.randint(
-            1, 6, size=(self.num_filter, self.num_channel, self.filter_size, self.filter_size))
+        self.kernel = np.random.randn(self.num_filter, self.num_channel, self.filter_size, self.filter_size)
         
 
     def iterate_regions(self, image, n, width, height): 
         for i in range(height-(n-1)):
             for j in range(width-(n-1)):
                 im_region = image[i:(i+n), j:(j+n)]
-                print(im_region)
                 yield im_region, i, j
 
     def zero_padding(self, image, new_width, new_height):
@@ -40,7 +38,6 @@ class ConvolutionalStage():
 
         self.inputs = np.zeros((channel, width, height))
         feature_maps = np.zeros((self.num_filter, out_width, out_heigth))
-        print(self.kernel)
         for c in range(channel):
             self.inputs[c, :, :] = self.zero_padding(inputs[c, :, :], width, height)
             # print(self.inputs[c])
@@ -118,21 +115,21 @@ class ConvolutionLayer():
 
 
 
-matrix = np.array([[[1,7,-2],[11,1,23],[2,2,2]],[[1,5,2],[10,-1,20],[4,2,4]],[[6,7,8],[12,-4,6],[8,2,6]]])
+# matrix = np.array([[[1,7,-2],[11,1,23],[2,2,2]],[[1,5,2],[10,-1,20],[4,2,4]],[[6,7,8],[12,-4,6],[8,2,6]]])
 
-convo = ConvolutionalStage(2, 2, 3)
+# convo = ConvolutionalStage(2, 2, 3)
 
-# feature_maps = convo.forward(matrix)
+# # feature_maps = convo.forward(matrix)
 
-pooling = PoolingStage(2,1,True)
+# pooling = PoolingStage(2,1,True)
 
-pooled_map = pooling.forward(matrix)
+# pooled_map = pooling.forward(matrix)
 
-detect = DetectionStage()
+# detect = DetectionStage()
 
-output = detect.forward(matrix, "relu")
+# output = detect.forward(matrix, "relu")
 
-print(output)
+# print(output)
 
 # print(feature_maps)
 
