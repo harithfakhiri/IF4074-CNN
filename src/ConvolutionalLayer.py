@@ -1,4 +1,3 @@
-from turtle import forward
 import numpy as np
 
 class ConvolutionalStage():
@@ -13,8 +12,7 @@ class ConvolutionalStage():
             1, 6, size=(self.num_filter, self.num_channel, self.filter_size, self.filter_size))
         
 
-    def iterate_regions(self, image, n, width, height): #n adalah ukuran receptive/field dan matriks kernel
-        #generates all possible 3*3 image regions using valid padding
+    def iterate_regions(self, image, n, width, height): 
         for i in range(height-(n-1)):
             for j in range(width-(n-1)):
                 im_region = image[i:(i+n), j:(j+n)]
@@ -86,8 +84,8 @@ class PoolingStage():
 
 
 class DetectionStage():
-    def __init__(self):
-        pass
+    def __init__(self, activation_function):
+        self.activation_function = activation_function
     
     def calc_activation_func(self, X):
         if (self.activation_function.lower() == "sigmoid"):
@@ -95,8 +93,7 @@ class DetectionStage():
         elif (self.activation_function.lower() == "relu"):
             return np.maximum(0, X)
 
-    def forward(self, inputs, activation_function):
-        self.activation_function = activation_function
+    def forward(self, inputs):
         chanel = inputs.shape[0]
         width = inputs.shape[1]
         height = inputs.shape[2]
@@ -105,6 +102,19 @@ class DetectionStage():
             output[c, :, :] = self.calc_activation_func(inputs[c, :, :])
         
         return output
+
+class ConvolutionLayer():
+    def __init__(self, filter_size, num_filter,  num_channel, isMax, act_func_detection, stride=1, padding=0):
+        self.convolution_stage = ConvolutionalStage(filter_size, num_filter,  num_channel, stride, padding)
+        self.detection_stage = DetectionStage(act_func_detection)
+        self.pooling_stage = PoolingStage(filter_size, stride, isMax)
+    
+    def forward(self, inputs):
+        feature_map = self.convolution_stage.forward(inputs)
+        output_detection = self.detection_stage.forward(feature_map)
+        output_pooling = self.pooling_stage.forward(output_detection)
+
+        return output_pooling
 
 
 
