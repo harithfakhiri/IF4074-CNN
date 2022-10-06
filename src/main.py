@@ -19,13 +19,15 @@ def countAccuracy(image_name, label_array, label_trained):
     final = float(score/n)
     return final
 
-utils = Utils()
-
 def label_name(prediction):
     if(prediction==0):
         return "dogs"
     elif(prediction==1):
         return "cats"
+
+
+utils = Utils()
+
 #Load all image
 matrix_image = utils.loadTrainDataSet()
 
@@ -36,6 +38,7 @@ dataset_num = len(preprocess_mat)
 channel = len(preprocess_mat[0])
 wh = len(preprocess_mat[0][0])
 
+#inisiasi CNN
 cnn = CNN(
     ConvolutionLayer(filter_size=3, num_filter=3,  num_channel=channel, 
                     isMax=True, act_func_detection="relu", stride=5, padding=0),
@@ -49,7 +52,7 @@ cnn = CNN(
 
 
 
-result = cnn.train(features=preprocess_mat, target=label_array, epochs=30, batch_size=1)
+result = cnn.predict(features=preprocess_mat)
 
 
 acc_score = countAccuracy(matrix_image, label_array,result)

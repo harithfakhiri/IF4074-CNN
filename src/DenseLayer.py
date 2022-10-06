@@ -7,8 +7,6 @@ class DenseLayer():
         self.n_units = n_units
         
         self.n_inputs = n_inputs
-        
-
 
     def calc_activation_func(self, X):
         if (self.activation_function.lower() == "sigmoid"):
@@ -22,11 +20,13 @@ class DenseLayer():
     def forward(self, inputs):
         output = []
         self.input = np.concatenate(([1], inputs.flatten()))
+        #inisiasi weight
         self.weight: np.array = [np.random.uniform(-1, 1, size=len(self.input)) for i in range(self.n_units)]
 
         for i in range(self.n_units):
-            # Sum Product
+            # dot product
             output.append(np.dot(self.input, self.weight[i]))
+        # Call activation function
         self.output = self.calc_activation_func(output)
         return self.output
 

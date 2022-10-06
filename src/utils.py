@@ -61,17 +61,8 @@ class Utils():
         green = self.createOneColor(squared, 1)
         blue = self.createOneColor(squared, 2)
         split_matrix = np.array([red,green,blue])
-        # print(split_matrix)
-        # print(split_matrix.shape)
         return split_matrix
 
-    # def createRedOnly(animal_arr):
-    #     for i in range(len(animal_arr)):
-    #         for j in range(len(animal_arr[0])):
-    #             for k in range(len(animal_arr[0][0])):
-    #                 if(k!=0):
-    #                     animal_arr[i][j][k] = 0
-    #     return animal_arr
 
     def loadAllData(self, animal_arr):
         #load dogs
@@ -99,6 +90,7 @@ class Utils():
         height_px = len(color_one)
         width_px = len(color_one[0])
         red = np.zeros((height_px, width_px), dtype=int)
+        #mengambil idx sesuai elemen RGB yang diminta
         for i in range(height_px):
             for j in range(width_px):
                 red[i][j] = color_one[i][j][idx]
@@ -107,6 +99,8 @@ class Utils():
     def squaredPadding(self, RGB_Matrix):
         height, width = RGB_Matrix.shape[0], RGB_Matrix.shape[1]
         matrix = np.zeros((height,width,3),dtype=int)
+
+        #mencari nilai maks dari weight dan height untuk membuat gambar berukuran berasio 1:1
         if (height>width):
             new_height = height
             new_width = height
@@ -115,16 +109,10 @@ class Utils():
             new_width = width
         padding_h = int((new_height - height)/2)
         padding_w = int((new_width - width)/2)
-        # print(padding_h, padding_w)
-        # print(new_height, new_width)
+
         matrix = np.zeros((new_height,new_width,3),dtype=int)
+        
         #inserting img to zeros
         matrix[padding_h:height + padding_h, padding_w:width + padding_w] = RGB_Matrix
-        # print(matrix)
-        return matrix
-        
 
-    # dogs = loadTrainDataSet(root, 'dogs')
-    # print(dogs)
-    # cats = loadTrainDataSet(root, 'cats')
-    # createMatrix(createPath(root,'dogs'), dogs, 9)
+        return matrix
