@@ -4,26 +4,26 @@ from ConvolutionalLayer import ConvolutionLayer
 from DenseLayer import DenseLayer
 from FlattenLayer import FlattenLayer
 
-def countAccuracy(image_name, label_array, label_trained):
-    score = 0
-    n = len(label_array)
-    for i in range(n):
-        if(label_array[i] == label_trained[i]):
-            score+=1
-        if(i<len(image_name[0])):
-            print(image_name[0][i], "--> label : ", label_name(label_array[i]), "and predicted as :", label_name(label_trained[i]))
-        else:
-            print(image_name[1][i-len(image_name[0])], ": label = ", label_name(label_array[i]), "and predicted as :", label_name(label_trained[i]))
-        print()
-        print("============================================================")
-    final = float(score/n)
-    return final
+# def countAccuracy(image_name, label_array, label_trained):
+#     score = 0
+#     n = len(label_array)
+#     for i in range(n):
+#         if(label_array[i] == label_trained[i]):
+#             score+=1
+#         if(i<len(image_name[0])):
+#             print(image_name[0][i], "--> label : ", label_name(label_array[i]), "and predicted as :", label_name(label_trained[i]))
+#         else:
+#             print(image_name[1][i-len(image_name[0])], ": label = ", label_name(label_array[i]), "and predicted as :", label_name(label_trained[i]))
+#         print()
+#         print("============================================================")
+#     final = float(score/n)
+#     return final
 
-def label_name(prediction):
-    if(prediction==0):
-        return "dogs"
-    elif(prediction==1):
-        return "cats"
+# def label_name(prediction):
+#     if(prediction==0):
+#         return "dogs"
+#     elif(prediction==1):
+#         return "cats"
 
 
 utils = Utils()
@@ -47,15 +47,20 @@ cnn = CNN(
     FlattenLayer(),
     DenseLayer(n_units=100, activation_function='relu'),
     DenseLayer(n_units=10, activation_function='relu'),
-    DenseLayer(n_units=1, activation_function='sigmoid')
+    DenseLayer(n_units=1, activation_function='sigmoid'),
+
 )
 
 
 
-result = cnn.predict(features=preprocess_mat)
+result = cnn.predict(features=preprocess_mat,
+    target=label_array,
+    batch_size=5,
+    epochs=5,
+    learning_rate=0.1)
 
 
-acc_score = countAccuracy(matrix_image, label_array,result)
+# acc_score = countAccuracy(matrix_image, label_array,result)
 
 print()
-print("the final accuracy score is", acc_score)
+# print("the final accuracy score is", acc_score)
