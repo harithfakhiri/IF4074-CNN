@@ -5,12 +5,14 @@ class ConvolutionalStage():
         self.num_channel = num_channel
         self.padding = padding
         self.filter_size = filter_size
+        # print("filter size", self.filter_size)
         self.num_filter = num_filter
         self.stride = stride
         self.bias = np.zeros((num_filter))
         self.kernel = np.random.randn(self.num_filter, self.num_channel, self.filter_size, self.filter_size)
-        self._dw = np.zeros((num_filter, num_channel, filter_size, filter_size))
-        self._db = np.zeros((num_filter))
+        # print("self.kernel", self.kernel)
+        self.delta_w = np.zeros((num_filter, num_channel, filter_size, filter_size))
+        self.delta_b = np.zeros((num_filter))
         
 
     def iterate_regions(self, image, n, width, height): 
@@ -52,34 +54,30 @@ class ConvolutionalStage():
 
     # Update weight when 1 batch is finished
     def updatekernel(self,learning_rate, momentum):
-        self.kernel -= learning_rate * self._dw
-        self.bias -= learning_rate * self._db
+        self.kernel -= learning_rate * self.delta_w
+        self.bias -= learning_rate * self.delta_b
 
-        self.error_back_zeros()
-    
-    def error_back_zeros(self):
-        self._dw = np.zeros((self.num_filter, self.num_channel, self.filter_size, self.filter_size))
-        self._db = np.zeros((self.num_filter))
+        self.delta_w = np.zeros((self.num_filter, self.num_channel, self.filter_size, self.filter_size))
+        self.delta_b = np.zeros((self.num_filter))
         
     def backward(self, prev_errors):
-        C, W, H = self.inputs.shape
-        dx = np.zeros(self.inputs.shape)
-        dw = np.zeros(self.kernel.shape)
-        db = np.zeros(self.bias.shape)
+        delta_x = np.zeros(self.inputs.shape)
+        delta_w = np.zeros(self.kernel.shape)
+        delta_b = np.zeros(self.bias.shape)
 
         F, W, H = prev_errors.shape
         for f in range(F):
             for w in range(W):
                 for h in range(H):
-                    dw[f,:,:,:]+=prev_errors[f,w,h]*self.inputs[:,w:w+self.filter_size,h:h+self.filter_size]
-                    dx[:,w:w+self.filter_size,h:h+self.filter_size]+=prev_errors[f,w,h]*self.kernel[f,:,:,:]
+                    delta_w[f,:,:,:]+=prev_errors[f,w,h]*self.inputs[:,w:w+self.filter_size,h:h+self.filter_size]
+                    delta_x[:,w:w+self.filter_size,h:h+self.filter_size]+=prev_errors[f,w,h]*self.kernel[f,:,:,:]
 
         for f in range(F):
-            db[f] = np.sum(prev_errors[f, :, :])
+            delta_b[f] = np.sum(prev_errors[f, :, :])
 
-        self._dw += dw
-        self._db += db
-        return dx
+        self.delta_w += delta_w
+        self.delta_b += delta_b
+        return delta_x
 
 class PoolingStage():
     def __init__(self, filter_size, stride, isMax):
@@ -114,15 +112,15 @@ class PoolingStage():
 
     def backward(self, prev_errors):
         F, W, H = self.inputs.shape
-        dx = np.zeros(self.inputs.shape)
+        delta_x = np.zeros(self.inputs.shape)
         for f in range(0, F):
             for w in range(0, W, self.filter_size):
                 for h in range(0, H, self.filter_size):
                     st = np.argmax(self.inputs[f, w:w+self.filter_size, h:h+self.filter_size])
-                    (idx, idy) = np.unravel_index(st, (self.filter_size, self.filter_size))
-                    if ((w + idx) < W and (h+idy) < H):
-                        dx[f, w+idx, h+idy] = prev_errors[f, int(w/self.filter_size) % prev_errors.shape[1], int(h/self.filter_size) % prev_errors.shape[2]]
-        return dx
+                    (idelta_x, idy) = np.unravel_index(st, (self.filter_size, self.filter_size))
+                    if ((w + idelta_x) < W and (h+idy) < H):
+                        delta_x[f, w+idelta_x, h+idy] = prev_errors[f, int(w/self.filter_size) % prev_errors.shape[1], int(h/self.filter_size) % prev_errors.shape[2]]
+        return delta_x
     
 
 
@@ -149,9 +147,9 @@ class DetectionStage():
         return output
 
     def backward(self, prev_errors):
-        dx = prev_errors.copy()
-        dx[self.inputs < 0] = 0
-        return dx
+        delta_x = prev_errors.copy()
+        delta_x[self.inputs < 0] = 0
+        return delta_x
 
 class ConvolutionLayer():
     def __init__(self, filter_size, num_filter,  num_channel, isMax, act_func_detection, stride=1, padding=0):
@@ -161,17 +159,23 @@ class ConvolutionLayer():
     
     def forward(self, inputs):
         feature_map = self.convolution_stage.forward(inputs)
+        print("kelar convo")
         output_detection = self.detection_stage.forward(feature_map)
+        print("kelar detec ")
         output_pooling = self.pooling_stage.forward(output_detection)
+        print("kelar pooling")
 
         return output_pooling
     
     def backward(self, prev_errors):
-        dx_pooling = self.pooling_stage.backward(prev_errors)
-        dx_detection = self.detection_stage.backward(dx_pooling)
-        dx_convo = self.convolution_stage.backward(dx_detection)
+        delta_x_pooling = self.pooling_stage.backward(prev_errors)
+        print("kelar backward pool")
+        delta_x_detection = self.detection_stage.backward(delta_x_pooling)
+        print("kelar backward detec")
+        delta_x_convo = self.convolution_stage.backward(delta_x_detection)
+        print("kelar backward convo")
 
-        return dx_convo
+        return delta_x_convo
     
     def update_weights(self, learning_rate, momentum):
         self.convolution_stage.updatekernel(learning_rate, momentum)

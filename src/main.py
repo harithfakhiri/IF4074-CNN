@@ -40,7 +40,7 @@ wh = len(preprocess_mat[0][0])
 
 #inisiasi CNN
 cnn = CNN(
-    ConvolutionLayer(filter_size=3, num_filter=3,  num_channel=channel, 
+    ConvolutionLayer(filter_size=8, num_filter=3,  num_channel=channel, 
                     isMax=True, act_func_detection="relu", stride=5, padding=0),
     ConvolutionLayer(filter_size=2, num_filter=2,  num_channel=channel, 
                     isMax=True, act_func_detection="relu", stride=1, padding=0),
@@ -52,12 +52,11 @@ cnn = CNN(
 )
 
 
-
 result = cnn.predict(features=preprocess_mat,
     target=label_array,
-    batch_size=5,
-    epochs=5,
-    learning_rate=0.1)
+    batch_size=10,
+    epochs=7,
+    learning_rate=0.05)
 
 
 # acc_score = countAccuracy(matrix_image, label_array,result)

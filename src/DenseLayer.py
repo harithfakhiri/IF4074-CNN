@@ -1,4 +1,8 @@
 import numpy as np
+import warnings
+
+#suppress warnings
+warnings.filterwarnings('ignore')
 
 class DenseLayer():
     def __init__(self, n_units, activation_function, n_inputs=None,):  
@@ -21,7 +25,8 @@ class DenseLayer():
         output = []
         self.input = np.concatenate(([], inputs.flatten()))
         #inisiasi weight
-        self.weight: np.array = [np.random.uniform(-1, 1, size=len(self.input)) for i in range(self.n_units)]
+        # self.weight: np.array = [np.random.uniform(-10, 10, size=len(self.input)) for i in range(self.n_units)]
+        self.weight: np.array = [(np.random.randn(len(self.input)) * 0.5) for i in range(self.n_units)]
         self.deltaW = np.zeros((self.n_units))
 
         for i in range(self.n_units):
@@ -52,6 +57,7 @@ class DenseLayer():
         derivative_values = np.array([])
         for x in self.output:
             derivative_values = np.append(derivative_values, self.get_derivative(self.activation_function, x))
+        
         self.deltaW += np.multiply(derivative_values, prev_errors)
         # weight matrix representation: row for output, column for input
         dE = np.matmul(prev_errors, self.weight)

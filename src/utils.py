@@ -8,6 +8,8 @@ import os
 import numpy as np
 from numpy import asarray
 from PIL import Image
+import pickle 
+
 
 class Utils():
     def __init__(self):
@@ -48,12 +50,12 @@ class Utils():
 
         return dogs, cats
 
-    def createMatrix(self, animal_arr, idx, animal):
+    def createMatrix(self, animal_arr, idelta_x, animal):
         if (animal.lower() =='dogs'):
-            image = Image.open(self.path_dogs+'/'+animal_arr[0][idx])
+            image = Image.open(self.path_dogs+'/'+animal_arr[0][idelta_x])
             data = asarray(image)
         elif (animal.lower() =='cats'):
-            image = Image.open(self.path_cats+'/'+animal_arr[1][idx])
+            image = Image.open(self.path_cats+'/'+animal_arr[1][idelta_x])
             data = asarray(image)
 
         squared = self.squaredPadding(data)
@@ -86,14 +88,14 @@ class Utils():
         
         return total_matrix, label_array
     
-    def createOneColor(self, color_one,idx):
+    def createOneColor(self, color_one,idelta_x):
         height_px = len(color_one)
         width_px = len(color_one[0])
         red = np.zeros((height_px, width_px), dtype=int)
-        #mengambil idx sesuai elemen RGB yang diminta
+        #mengambil idelta_x sesuai elemen RGB yang diminta
         for i in range(height_px):
             for j in range(width_px):
-                red[i][j] = color_one[i][j][idx]
+                red[i][j] = color_one[i][j][idelta_x]
         return red
         
     def squaredPadding(self, RGB_Matrix):
@@ -116,3 +118,12 @@ class Utils():
         matrix[padding_h:height + padding_h, padding_w:width + padding_w] = RGB_Matrix
 
         return matrix
+    def saveModel(self, filename):
+        with open(filename, 'wb') as f:
+            pickle.dump(self.layers, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+    def loadModel(self, filename):
+        with open(filename, 'rb') as f:
+            layers = pickle.load(f)
+        self.layers = []
+        self.layers = layers.copy()
